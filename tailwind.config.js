@@ -7,7 +7,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        bluegreen: '#D1F9FF',
+        bluegreen1: '#D1F9FF',
+        bluegreen2: '#D1F900',
       },
     },
   },
