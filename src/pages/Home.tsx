@@ -7,6 +7,33 @@ import Card from "../components/Card";
 export default function Home(): JSX.Element {
   const [currentSlide, setCurrentSlide] = React.useState(0);
 
+  const SlickArrowLeft = ({ currentSlide, slideCount, ...props }) => (
+    <button
+      {...props}
+      className={
+        "slick-prev slick-arrow" + (currentSlide === 0 ? " slick-disabled" : "")
+      }
+      aria-hidden="true"
+      aria-disabled={currentSlide === 0 ? true : false}
+      type="button"
+    >
+      Previous
+    </button>
+  );
+  const SlickArrowRight = ({ currentSlide, slideCount, ...props }) => (
+    <button
+      {...props}
+      className={
+        "slick-next slick-arrow" +
+        (currentSlide === slideCount - 1 ? " slick-disabled" : "")
+      }
+      aria-hidden="true"
+      aria-disabled={currentSlide === slideCount - 1 ? true : false}
+      type="button"
+    >
+      Next
+    </button>
+  );
   const settings = {
     dots: false,
     infinite: true,
@@ -14,15 +41,8 @@ export default function Home(): JSX.Element {
     slidesToShow: 1,
     slidesToScroll: 1,
     arrows: true,
-    prevArrow: (
-      <button onClick={() => setCurrentSlide(currentSlide - 1)}>
-        Previous
-      </button>
-    ),
-    nextArrow: (
-      <button onClick={() => setCurrentSlide(currentSlide + 1)}>Next</button>
-    ),
-    afterChange: (index: number) => setCurrentSlide(index),
+    prevArrow: <SlickArrowLeft currentSlide={currentSlide} slideCount={undefined} />,
+    nextArrow: <SlickArrowRight currentSlide={currentSlide} slideCount={undefined} />,
     responsive: [
       {
         breakpoint: 1024,
@@ -128,43 +148,47 @@ export default function Home(): JSX.Element {
         ))}
       </Slider>
       {/* types map to sections and map data to card each type section */}
-      {types.map((type, index) => (
-        <div key={index}>
-          <h1 className="flex justify-between mx-1 text-2xl font-bold">
-            {type}
-            <span className=" text-blue-700 font-bold">more...</span>
-          </h1>
-          <div className="my-4">
-            <Slider
-              style={{ padding: "0 10px", textAlign: "left" }}
-              {...{
-                slidesToShow: 5,
-                slidesToScroll: 5,
-                arrows: true,
-                prevArrow: (
-                  <button onClick={() => setCurrentSlide(currentSlide - 1)}>
-                    Previous
-                  </button>
-                ),
-                nextArrow: (
-                  <button onClick={() => setCurrentSlide(currentSlide + 1)}>
-                    Next
-                  </button>
-                ),
-                afterChange: (index: number) => setCurrentSlide(index),
-                speed: 200,
-                infinite: false,
-              }}
-            >
-              {data.map((item, index) => {
-                if (type === item.ProductTypeSet)
-                  return <Card G={undefined} {...item} />;
-                return null;
-              })}
-            </Slider>
+      {types.map((type, index) => {
+        const [newCurrent, setNewCurrentSlide] = React.useState(0);
+        return (
+          <div key={index}>
+            <h1 className="flex justify-between mx-1 text-2xl font-bold">
+              {type}
+              <span className=" text-blue-700 font-bold">more...</span>
+            </h1>
+
+            <div className="my-4">
+              <Slider
+                style={{ padding: "0 10px", textAlign: "left" }}
+                {...{
+                  slidesToShow: 5,
+                  slidesToScroll: 5,
+                  arrows: true,
+                  prevArrow: (
+                    <button onClick={() => setNewCurrentSlide(newCurrent - 1)}>
+                      Previous
+                    </button>
+                  ),
+                  nextArrow: (
+                    <button onClick={() => setNewCurrentSlide(newCurrent + 1)}>
+                      Next
+                    </button>
+                  ),
+                  afterChange: (index: number) => setNewCurrentSlide(index),
+                  speed: 200,
+                  infinite: false,
+                }}
+              >
+                {data.map((item, index) => {
+                  if (type === item.ProductTypeSet)
+                    return <Card key={item._id} G={undefined} {...item} />;
+                  return null;
+                })}
+              </Slider>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </>
   );
 }
