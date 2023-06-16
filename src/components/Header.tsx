@@ -1,11 +1,35 @@
 // components
 import React from "react";
+import { NavLink } from "react-router-dom";
+// Add this to your project's type definitions
+declare module "react-router-dom" {
+  interface NavLinkProps {
+    activeClassName?: string;
+  }
+}
 
 export default function Header(): JSX.Element {
   const [showMenu, setShowMenu] = React.useState(false);
 
-  const handleButtonClick = (url: string) => {
+  const handleButtonClick = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    url: string
+  ) => {
     window.location.href = url;
+    console.log(e);
+    return;
+    // add className target tailwind underline blue
+    if (url !== "/") {
+      e.currentTarget.classList.add(
+        "mx-2",
+        "px-2",
+        "text-1xl",
+        "outline-purple-700",
+        "hover:bg-gray-100",
+        "underline",
+        "text-blue-500"
+      );
+    }
   };
 
   return (
@@ -13,43 +37,25 @@ export default function Header(): JSX.Element {
       <header className="max-w-4xl mx-auto flex items-center justify-between px-8 py-3">
         <div className="flex items-center">
           <img
-            onClick={() => handleButtonClick("/")}
+            onClick={() => {
+              window.location.href = "/";
+            }}
             src="https://mynovel.co/static/assets/img/logos/MyNovel_sec1.png"
             alt="Logo"
             className="overflow-clip box-content h-16 cursor-pointer"
           />
         </div>
         <div className="hidden md:flex items-center space-x-4">
-          <button
-            className="mx-2 px-2 text-1xl outline-purple-700 hover:bg-gray-100"
-            onClick={() => handleButtonClick("/cartoon")}
+          <NavLink
+            className={({ isActive }) =>
+              !isActive
+                ? "mx-2 px-2 text-1xl outline-purple-700 hover:bg-gray-100"
+                : "underline font-bold text-blue-500"
+            }
+            to="/cartoon"
           >
             การ์ตูน
-          </button>
-          <button
-            className="mx-2 px-2 text-1xl outline-purple-700 hover:bg-gray-100"
-            onClick={() => handleButtonClick("/novel")}
-          >
-            นิยายลิขสิทธิ์
-          </button>
-          <button
-            className="mx-2 px-2 text-1xl outline-purple-700 hover:bg-gray-100"
-            onClick={() => handleButtonClick("/fiction")}
-          >
-            นิยายแต่ง
-          </button>
-          <button
-            className="mx-2 px-2 text-1xl outline-purple-700 hover:bg-gray-100"
-            onClick={() => handleButtonClick("/ebook")}
-          >
-            อีบุ๊ค
-          </button>
-          <button
-            className="mx-2 px-2 text-1xl outline-purple-700 hover:bg-gray-100"
-            onClick={() => handleButtonClick("/search")}
-          >
-            ค้นหา
-          </button>
+          </NavLink>
         </div>
         <div className="md:hidden flex items-center">
           <button onClick={() => setShowMenu(!showMenu)}>
@@ -76,42 +82,17 @@ export default function Header(): JSX.Element {
         {showMenu && (
           <div className="md:hidden absolute top-0 left-0 w-full h-full bg-white z-10">
             <div className="flex flex-col items-center justify-center h-full space-y-4">
-              <button
-                className="mx-2 px-2 text-2xl outline-purple-700 hover:bg-gray-100"
-                onClick={() => handleButtonClick("/")}
-              >
-                หน้าแรก
-              </button>
-              <button
-                className="mx-2 px-2 text-2xl outline-purple-700 hover:bg-gray-100"
-                onClick={() => handleButtonClick("/cartoon")}
+              <NavLink
+                className={({ isActive }) =>
+                  !isActive
+                    ? "mx-2 px-2 text-1xl outline-purple-700 hover:bg-gray-100"
+                    : "underline font-bold text-blue-500"
+                }
+                to="/cartoon"
+                onClick={() => setShowMenu(!showMenu)}
               >
                 การ์ตูน
-              </button>
-              <button
-                className="mx-2 px-2 text-2xl outline-purple-700 hover:bg-gray-100"
-                onClick={() => handleButtonClick("/novel")}
-              >
-                นิยายลิขสิทธิ์
-              </button>
-              <button
-                className="mx-2 px-2 text-2xl outline-purple-700 hover:bg-gray-100"
-                onClick={() => handleButtonClick("/fiction")}
-              >
-                นิยายแต่ง
-              </button>
-              <button
-                className="mx-2 px-2 text-2xl outline-purple-700 hover:bg-gray-100"
-                onClick={() => handleButtonClick("/ebook")}
-              >
-                อีบุ๊ค
-              </button>
-              <button
-                className="mx-2 px-2 text-2xl outline-purple-700 hover:bg-gray-100"
-                onClick={() => handleButtonClick("/search")}
-              >
-                ค้นหา
-              </button>
+              </NavLink>
             </div>
           </div>
         )}
