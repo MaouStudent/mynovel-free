@@ -26,7 +26,7 @@ export default function App() {
       )
         .then((res) => res.json())
         .then((data) => {
-          setTitle(data[["ProductName"]]);
+          setTitle(data["ProductName"]);
           const chapterList = data["EpTopic"].map((chapter) => ({
             id: chapter["EpId"],
             name: chapter["EpName"],

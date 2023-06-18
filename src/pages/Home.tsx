@@ -1,8 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Card from "../components/Card";
+// import fa fas icons
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faList } from "@fortawesome/free-solid-svg-icons";
+// type
+interface TypeData {
+  _id: string;
+  id: string;
+  ProductName: string;
+  ProductIntro: string;
+  CreateBy: string;
+  CreateId: string;
+  ProductView: number;
+  ProductGroup: string;
+  ProductTypeSet: string;
+  isPublish: boolean;
+  ImageUrl: string;
+  EpCountPublised: number;
+  ProductRate: string;
+  ProductType: string;
+  fanClubTranslate: string;
+  ProductPublisher: string;
+  isCopyright: boolean;
+  ProductPrice: number;
+  G;
+  isFinished: boolean;
+  EpLastUpdate: string;
+  Discount: number;
+  isAccept: boolean;
+}
 
 export default function Home(): JSX.Element {
   const [currentSlide, setCurrentSlide] = React.useState(0);
@@ -41,8 +69,12 @@ export default function Home(): JSX.Element {
     slidesToShow: 1,
     slidesToScroll: 1,
     arrows: true,
-    prevArrow: <SlickArrowLeft currentSlide={currentSlide} slideCount={undefined} />,
-    nextArrow: <SlickArrowRight currentSlide={currentSlide} slideCount={undefined} />,
+    prevArrow: (
+      <SlickArrowLeft currentSlide={currentSlide} slideCount={undefined} />
+    ),
+    nextArrow: (
+      <SlickArrowRight currentSlide={currentSlide} slideCount={undefined} />
+    ),
     responsive: [
       {
         breakpoint: 1024,
@@ -72,61 +104,34 @@ export default function Home(): JSX.Element {
     "https://images.mynovel.co/Banner/5.%20Banner_ชายาป่วนกวนวังหลัง-01.jpg",
   ];
 
-  const types = ["Cartoon", "Novel"];
+  const [ndata, setNData] = React.useState<TypeData[]>([]);
+  const [newcurrentSlide, setnewcurrentSlide] = React.useState(0); // move the useState call outside of the loop
+  const [loading, setLoading] = useState(true);
 
-  const data = [
-    {
-      _id: "648c58631ba45335332c428c",
-      id: "02Bwk7cyUS0lGmg6i8Vc",
-      ProductName: "Buddy Beasts Chronicle : ฝ่ามิติเกมอสูรมหัศจรรย์",
-      ProductIntro:
-        "อัญมณีโลกมอนสเตอร์ตกอยู่ในมืออสูรร้าย  ภัยพิบัติโลกมนุษย์และมอนสเตอร์จึงเกิดขึ้น!\nแรงบันดาลใจจากเสียงเพลง  ความกล้าหาญของมนุษย์ผู้ถูกเลือก  และมิตรภาพต่างสายพันธุ์  คือความหวังเดียวที่จะหยุดยั้งได้",
-      CreateBy: "Dandy & Buddy Beasts",
-      CreateId: "8fFsOTNdaRL5rRWlHBET",
-      ProductView: 35,
-      ProductGroup: "แอคชั่น",
-      ProductTypeSet: "Novel",
-      isPublish: true,
-      ImageUrl: "https://images.mynovel.co/images/Zblwh5cc1634048711306",
-      EpCountPublised: 2,
-      ProductRate: "ทั่วไป",
-      ProductType: "แฟนตาซี",
-      fanClubTranslate: "นิยายแต่ง",
-      ProductPublisher: "Dandy & Buddy Beasts",
-      isCopyright: false,
-      ProductPrice: 0,
-      isFinished: false,
-      EpLastUpdate: "2021-10-16T10:56:16.062Z",
-      Discount: 0,
-      isAccept: true,
-    },
-    {
-      _id: "648c58631ba45335332c428f",
-      id: "0JVvBzUCEWoKZ6Isy89J",
-      ProductName: "ซิ่ง!ทะลุมิติ(Super Driver)",
-      ProductIntro:
-        "คนขับแท็กซี่ผู้ยากจน เจอเหตุการณ์ประหลาด ในวันหนึ่ง ระบบนำทาง ก็พาเขาไปรับผู้โดยสารแปลกๆ และระบบยังบอกจุดหมายให้ไปส่งยังมิติต่างๆ และทุกครั้งที่ส่งผู้โดยสาร",
-      CreateBy: "เทาเทีย",
-      CreateId: "nNggxH2Ep6hug9Djvz7y",
-      ProductView: 3834,
-      ProductGroup: "แฟนตาซี",
-      ProductTypeSet: "Cartoon",
-      isPublish: true,
-      ImageUrl: "https://images.mynovel.co/images/nSmWEJAZ1637972035777",
-      EpCountPublised: 169,
-      ProductRate: "ทั่วไป",
-      ProductType: "ผจญภัย",
-      fanClubTranslate: "นิยายแปล",
-      ProductPublisher: "เทาเทีย",
-      isCopyright: false,
-      ProductPrice: 0,
-      isFinished: false,
-      EpLastUpdate: "2023-01-21T01:10:25.308Z",
-      Discount: 0,
-      isAccept: true,
-    },
-  ];
+  useEffect(() => {
+    fetch(
+      "https://asia-southeast2-mynovel01.cloudfunctions.net/product/FETCH-PRODUCTS-SEARCH",
+      {
+        headers: {
+          "content-type": "application/json",
+        },
+        body: null,
+        method: "POST",
+      }
+    )
+      .then(async (response) => {
+        setNData(await response.json());
+        setLoading(false);
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
+  // filter each data by types Dict
+  const types = Array.from(new Set(ndata.map((item) => item.ProductTypeSet)));
+  const typesDict = types.reduce((acc, type) => {
+    acc[type] = ndata.filter((item) => item.ProductTypeSet === type);
+    return acc;
+  }, {});
   return (
     <>
       <Slider {...settings}>
@@ -134,12 +139,12 @@ export default function Home(): JSX.Element {
           <div key={index}>
             <img
               src={image}
-              height="400"
+              height="auto"
               width="auto"
               style={{
-                width: "750px",
-                maxHeight: "300px",
-                borderRadius: "30px",
+                maxWidth: "900px",
+                maxHeight: "500px",
+                borderRadius: "40px",
               }}
               className="focus:outline-none mx-auto my-5 py-3 px-0"
               alt={`Slide ${index}`}
@@ -147,42 +152,104 @@ export default function Home(): JSX.Element {
           </div>
         ))}
       </Slider>
-      {/* types map to sections and map data to card each type section */}
-      {types.map((type, index) => {
-        const [newCurrent, setNewCurrentSlide] = React.useState(0);
+      {(types as string[]).map((typeName: string, index: number) => {
         return (
           <div key={index}>
             <h1 className="flex justify-between mx-1 text-2xl font-bold">
-              {type}
+              {typeName}
               <span className=" text-blue-700 font-bold">more...</span>
             </h1>
-
             <div className="my-4">
+              {/* show card for each item */}
               <Slider
-                style={{ padding: "0 10px", textAlign: "left" }}
-                {...{
-                  slidesToShow: 5,
-                  slidesToScroll: 5,
-                  arrows: true,
-                  prevArrow: (
-                    <button onClick={() => setNewCurrentSlide(newCurrent - 1)}>
-                      Previous
-                    </button>
-                  ),
-                  nextArrow: (
-                    <button onClick={() => setNewCurrentSlide(newCurrent + 1)}>
-                      Next
-                    </button>
-                  ),
-                  afterChange: (index: number) => setNewCurrentSlide(index),
-                  speed: 200,
-                  infinite: false,
-                }}
+                className="mx-10 px-10"
+                leftMode={true}
+                slidesToShow={10}
+                slidesToScroll={10}
+                infinite={false}
               >
-                {data.map((item, index) => {
-                  if (type === item.ProductTypeSet)
-                    return <Card key={item._id} G={undefined} {...item} />;
-                  return null;
+                {typesDict[typeName].map((item: TypeData, index: number) => {
+                  return !item.ImageUrl ? null : (
+                    <div
+                      key={item.id}
+                      className="flex flex-col justify-center items-center"
+                    >
+                      <div
+                        className="transition-3d-hover mx-center cursor-pointer"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title={item.ProductName}
+                      >
+                        <a
+                          href={`/product?id=${item.id}`}
+                          data-toggle="modal"
+                          data-target=".bd-example-modal-xl"
+                          data-backdrop="static"
+                          data-keyboard="false"
+                          draggable="false"
+                        >
+                          <div className="relative h-56 w-40 min-w-40 min-h-56 rounded-lg overflow-hidden">
+                            <span
+                              className="lazy-load-image-background lazy-load-image-loaded block"
+                              style={{ color: "transparent" }}
+                            >
+                              <img
+                                alt={item.ProductName}
+                                draggable="false"
+                                src={item.ImageUrl}
+                                className="h-56 w-40 min-w-40 min-h-56 bg-contain bg-no-repeat bg-center-top rounded-lg bg-blue-200"
+                              />
+                            </span>
+                            <span
+                              className="absolute bottom-0 right-0 text-white font-bold text-right pr-1 pb-1 w-full"
+                              style={{
+                                background:
+                                  "linear-gradient(0deg, rgba(45, 45, 45, 0.9), rgba(45, 45, 45, 0))",
+                              }}
+                            >
+                              updated to {item.EpCountPublised}
+                            </span>
+                          </div>
+                        </a>
+                        <div className="mb-2">
+                          <div className="overflow-hidden"></div>
+                          <div
+                            className="pt-2"
+                            style={{ width: "160px", lineHeight: "1.2" }}
+                          >
+                            <h3
+                              className="card-title text-dark inline-block truncate cursor-pointer font-bold text-truncate"
+                              data-toggle="modal"
+                              data-target=".bd-example-modal-xl"
+                              data-backdrop="static"
+                              data-keyboard="false"
+                              style={{ width: "160px", fontSize: "16px" }}
+                            >
+                              {item.ProductName}
+                            </h3>
+                            {/* <span><small className="text-secondary inline-block truncate"><strong>โรแมนติก x ย้อนยุค</strong></small></span> */}
+                            <div
+                              className="flex justify-between text-xs"
+                              style={{ fontSize: "0.8em" }}
+                            >
+                              <div className="col-1">
+                                <strong>
+                                  <FontAwesomeIcon icon={faEye} style={{paddingRight:"5px"}} />
+                                  {item.ProductView}
+                                </strong>
+                              </div>
+                              <div className="col-2">
+                                <strong>
+                                  <FontAwesomeIcon icon={faList} style={{paddingRight:"5px"}} />
+                                  {item.EpCountPublised}
+                                </strong>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
                 })}
               </Slider>
             </div>
