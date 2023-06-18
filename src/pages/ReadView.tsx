@@ -4,8 +4,10 @@ export default function ReadView(): JSX.Element {
   const id: string = window.location.href.split("chapter=")[1];
   const [title, setTitle] = useState("");
   const [images, setImages] = useState([]);
+  const [details, setDetails] = useState("");
   const [nextId, setNextId] = useState("");
   const [prevId, setPrevId] = useState("");
+  const [productType, setProductType] = useState("");
 
   useEffect(() => {
     fetch(
@@ -13,20 +15,26 @@ export default function ReadView(): JSX.Element {
       {
         method: "POST",
         headers: {
+          accept: "application/json, text/plain, */*",
           "content-type": "application/json",
         },
         body: JSON.stringify({
+          fontCustom: "Sarabun",
           id: id,
         }),
       }
     ).then((res) => {
       res.json().then((data) => {
-        if (data["ImageUrlLists"]) setImages(data["ImageUrlLists"]);
+        setProductType(data["ProductTypeSet"]);
+        if (data["ImageUrlLists"] && data.ProductTypeSet == "Cartoon")
+          setImages(data["ImageUrlLists"]);
+        else if (data["EpDetail"] && data.ProductTypeSet == "Novel")
+          setDetails(data["EpDetail"]);
         if (data["EpName"]) setTitle(data["EpName"]);
         const numberCh: number = data["EpTopic"].length;
         data["EpTopic"].map((item: any, index: any) => {
           if (item["EpId"] === id) {
-            numberCh < index + 1
+            index + 1 >= numberCh
               ? null
               : setNextId(data["EpTopic"][index + 1]["EpId"]);
             index - 1 < 0
@@ -39,41 +47,37 @@ export default function ReadView(): JSX.Element {
     });
   }, []);
 
-  console.log(`ID: ${id}`);
-  console.log(`nextId: ${nextId}`);
-  console.log(`prevId: ${prevId}`);
-
   return (
     <>
-      <div>
-        {/* title chaptername */}
-        <div className="container mx-auto my-8">
-          <h1 className="text-center text-3xl font-bold">{title}</h1>
-        </div>
-        {/* Button next-prev */}
-        <div className="container mx-auto my-8 flex justify-between">
-          {prevId !== "" ? (
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={() => (window.location.href = `/read?chapter=${prevId}`)}
-            >
-              Prev
-            </button>
-          ) : (
-            <button></button>
-          )}
-          {nextId !== "" ? (
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={() => (window.location.href = `/read?chapter=${nextId}`)}
-            >
-              Next
-            </button>
-          ) : (
-            <button></button>
-          )}
-        </div>
-        {/* images scroll */}
+      {/* title chaptername */}
+      <div className="container mx-auto my-8">
+        <h1 className="text-center text-3xl font-bold">{title}</h1>
+      </div>
+      {/* Button next-prev */}
+      <div className="container mx-auto my-8 flex justify-between">
+        {prevId !== "" ? (
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={() => (window.location.href = `/read?chapter=${prevId}`)}
+          >
+            Prev
+          </button>
+        ) : (
+          <button></button>
+        )}
+        {nextId !== "" ? (
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={() => (window.location.href = `/read?chapter=${nextId}`)}
+          >
+            Next
+          </button>
+        ) : (
+          <button></button>
+        )}
+      </div>
+      {/* images scroll */}
+      {productType == "Cartoon" ? (
         <div className="container mx-auto my-8 flex justify-center">
           <div className="flex flex-wrap justify-center">
             {images.map((item, index) => (
@@ -81,7 +85,14 @@ export default function ReadView(): JSX.Element {
             ))}
           </div>
         </div>
-      </div>
+      ) : (
+        // novel scroll reader text
+        <div className="container mx-auto my-8 flex justify-center">
+          <div className="flex flex-wrap justify-center">
+            <div dangerouslySetInnerHTML={{ __html: details }} />
+          </div>
+        </div>
+      )}
       {/* Button next-prev */}
       <div className="container mx-auto my-8 flex justify-between">
         {prevId !== "" ? (

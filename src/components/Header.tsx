@@ -33,8 +33,8 @@ export default function Header(): JSX.Element {
   };
 
   return (
-    <div className="bg-bluegreen1">
-      <header className="max-w-4xl mx-auto flex items-center justify-between px-8 py-3">
+    <div className="container bg-bluegreen1 mx-auto">
+      <header className="mx-auto flex items-center text-center justify-between px-8 py-3">
         <div className="flex items-center">
           <img
             onClick={() => {

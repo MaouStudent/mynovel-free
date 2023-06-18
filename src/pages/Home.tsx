@@ -132,9 +132,13 @@ export default function Home(): JSX.Element {
     acc[type] = ndata.filter((item) => item.ProductTypeSet === type);
     return acc;
   }, {});
+  // typesDict sort by ProductView
+  Object.keys(typesDict).forEach((key) => {
+    typesDict[key].sort((a, b) => b.ProductView - a.ProductView);
+  });
   return (
     <>
-      <Slider {...settings}>
+      <Slider {...settings} className="container mx-auto w-full">
         {images.map((image, index) => (
           <div key={index}>
             <img
@@ -154,7 +158,7 @@ export default function Home(): JSX.Element {
       </Slider>
       {(types as string[]).map((typeName: string, index: number) => {
         return (
-          <div key={index}>
+          <div key={index} className="container mx-auto w-full">
             <h1 className="flex justify-between mx-1 text-2xl font-bold">
               {typeName}
               <span className=" text-blue-700 font-bold">more...</span>
@@ -164,8 +168,8 @@ export default function Home(): JSX.Element {
               <Slider
                 className="mx-10 px-10"
                 leftMode={true}
-                slidesToShow={10}
-                slidesToScroll={10}
+                slidesToShow={8}
+                slidesToScroll={8}
                 infinite={false}
               >
                 {typesDict[typeName].map((item: TypeData, index: number) => {
@@ -234,13 +238,19 @@ export default function Home(): JSX.Element {
                             >
                               <div className="col-1">
                                 <strong>
-                                  <FontAwesomeIcon icon={faEye} style={{paddingRight:"5px"}} />
+                                  <FontAwesomeIcon
+                                    icon={faEye}
+                                    style={{ paddingRight: "5px" }}
+                                  />
                                   {item.ProductView}
                                 </strong>
                               </div>
                               <div className="col-2">
                                 <strong>
-                                  <FontAwesomeIcon icon={faList} style={{paddingRight:"5px"}} />
+                                  <FontAwesomeIcon
+                                    icon={faList}
+                                    style={{ paddingRight: "5px" }}
+                                  />
                                   {item.EpCountPublised}
                                 </strong>
                               </div>
